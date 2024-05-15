@@ -1,0 +1,84 @@
+#include <iostream>
+#include <GL/freeglut.h>
+#include <FreeImage.h>
+
+using namespace std;
+
+GLuint textureID; // 텍스처 ID
+
+void render() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex2f(-1.0f, -1.0f);
+        
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex2f(1.0f, -1.0f);
+        
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex2f(1.0f, 1.0f);
+        
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex2f(-1.0f, 1.0f);
+    glEnd();
+    
+    glDisable(GL_TEXTURE_2D);
+    
+    glutSwapBuffers();
+}
+
+void reshape(int w, int h) {
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+void loadTexture() {
+    FIBITMAP* bitmap = FreeImage_Load(FIF_JPEG, "https://simage.mujikorea.net/goods/00/05/93/64/4548076714897_N_N_400.jpg");
+    
+    if (bitmap == nullptr) {
+        cerr << "이미지를 불러올 수 없습니다." << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    int width = FreeImage_GetWidth(bitmap);
+    int height = FreeImage_GetHeight(bitmap);
+    
+    BYTE* data = FreeImage_GetBits(bitmap);
+    
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    FreeImage_Unload(bitmap);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("Image Rotation");
+
+    glutDisplayFunc(render);
+    glutReshapeFunc(reshape);
+
+    glEnable(GL_DEPTH_TEST);
+
+    loadTexture();
+
+    glutMainLoop();
+
+    return 0;
+}

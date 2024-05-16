@@ -7,85 +7,79 @@
 
 
 
-
-
-
-
-
-
-
-
-
-#include <iostream>
 #include <GL/freeglut.h>
 
-
-GLuint textureID;
-
-
-void loadTexture() {
-    
-}
-
+// 회전 각도를 저장할 변수
+float angleX = 0.0f, angleY = 0.0f;
+int prevMouseX, prevMouseY;
+bool isDragging = false;
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+    gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-   
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    // 회전 적용
+    glRotatef(angleX, 1.0, 0.0, 0.0);
+    glRotatef(angleY, 0.0, 1.0, 0.0);
 
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex2f(-1.0f, -1.0f);
-
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex2f(1.0f, -1.0f);
-
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex2f(1.0f, 1.0f);
-
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex2f(-1.0f, 1.0f);
-    glEnd();
-
-    glDisable(GL_TEXTURE_2D);
+    glColor3f(3.0, 0.0, 1.0); // 주전자 색상 설정
+    glutWireTeapot(1.0); // 3D 주전자 그리기
 
     glutSwapBuffers();
 }
 
-
 void reshape(int w, int h) {
-    glViewport(0, 0, w, h);
+    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    gluPerspective(45.0, (GLfloat)w / (GLfloat)h, 1.0, 200.0);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 }
 
-
 void init() {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_DEPTH_TEST);
+}
 
-    
-    loadTexture();
+// 마우스 이동 이벤트 처리 함수
+void motion(int x, int y) {
+    if (isDragging) {
+        angleY += (x - prevMouseX);
+        angleX += (y - prevMouseY);
+        prevMouseX = x;
+        prevMouseY = y;
+        glutPostRedisplay();
+    }
+}
+
+// 마우스 클릭 이벤트 처리 함수
+void mouse(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON) {
+        if (state == GLUT_DOWN) {
+            isDragging = true;
+            prevMouseX = x;
+            prevMouseY = y;
+        } else if (state == GLUT_UP) {
+            isDragging = false;
+        }
+    }
 }
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 600);
-    glutCreateWindow("Image Rotation");
-
+    glutInitWindowSize(500, 500);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("3D Teapot Simulation");
+    init();
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-
-    init(); 
-
+    glutMotionFunc(motion);
+    glutMouseFunc(mouse);
     glutMainLoop();
-
     return 0;
 }
+
+
+

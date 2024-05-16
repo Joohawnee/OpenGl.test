@@ -3,6 +3,18 @@
 이번 주전자 과제를 하면서 OpenGL를 어떻게 활용하는지 어떤 프로그램을 사용하는지 알 수 있게 되어 좋았습니다. 
 막힌 부분도 많았지만 찾아보고 어떻게 해결해야할지 스스로 발전할 수 있는 계기가 되었습니다.
 
+![image](https://github.com/Joohawnee/OpenGl.test/assets/164468178/f3d449c1-d1e3-4c05-b74c-6cf4541d54c8)
+
+
+
+
+
+
+
+
+
+
+
 
 #include <iostream>
 #include <GL/freeglut.h>
